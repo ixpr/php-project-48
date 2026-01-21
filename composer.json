@@ -1,0 +1,17 @@
+{
+    "name": "hexlet/code",
+    "version": "0.0.1",
+    "bin": [
+        "./gendiff"
+    ],
+    "authors": [
+        {
+            "name": "ixpr",
+            "email": "contact@in-xeper.ru"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "docopt/docopt": "^1.0"
+    }
+}
