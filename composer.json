@@ -1,9 +1,6 @@
 {
     "name": "hexlet/code",
     "version": "0.0.1",
-    "bin": [
-        "./gendiff"
-    ],
     "authors": [
         {
             "name": "ixpr",

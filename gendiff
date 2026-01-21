@@ -15,15 +15,19 @@ Generate diff
 Usage:
   gendiff (-h|--help)
   gendiff (-v|--version)
+  gendiff [--format <fmt>] <firstFile> <secondFile>
 
 Options:
   -h --help                     Show this screen
   -v --version                  Show version
+  --format <fmt>                Report format [default: stylish]
 
 DOC;
 
-$handler = new \Docopt\Handler(array(
-    'help' => true,
-    'optionsFirst' => false,
-));
-$handler->handle($doc, $argv);
+$params = array(
+  'argv' => array_slice($_SERVER['argv'], 1),
+  'help' => true,
+  'version' => '1.0',
+  'optionsFirst' => false,
+);
+$args = Docopt::handle($doc, $params);
