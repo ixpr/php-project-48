@@ -31,3 +31,5 @@ $params = array(
   'optionsFirst' => false,
 );
 $args = Docopt::handle($doc, $params);
+
+Parse\process($args);
