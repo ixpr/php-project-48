@@ -32,4 +32,4 @@ $params = array(
 );
 $args = Docopt::handle($doc, $params);
 
-Parse\process($args);
+print_r(Differ\Differ\process($args));

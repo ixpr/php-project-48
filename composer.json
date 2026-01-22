@@ -10,7 +10,7 @@
     "license": "MIT",
     "autoload": {
         "files": [
-            "src/Parse.php"
+            "src/Differ.php"
         ]
     },
     "require": {
