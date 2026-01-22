@@ -28,20 +28,21 @@ function genDiff(string $pathToFile1, string $pathToFile2): string
         $keys = Collection\sortBy($keys, fn($num) => $num);
 
         $mapped = array_map(function ($item) use ($firstFile, $secondFile) {
-            if (array_key_exists($item, $firstFile) && array_key_exists($item, $secondFile)) {
-                if ($firstFile[$item] === $secondFile[$item]) {
-                    return "    {$item}: {$firstFile[$item]}";
-                } else {
-                    return [
-                        "  - {$item}: {$firstFile[$item]}",
-                        "  + {$item}: {$secondFile[$item]}"
-                    ];
+            $result = [];
+            if (
+                array_key_exists($item, $firstFile) && array_key_exists($item, $secondFile)
+                && $firstFile[$item] === $secondFile[$item]
+            ) {
+                $result[] = "    {$item}: {$firstFile[$item]}";
+            } else {
+                if (array_key_exists($item, $firstFile)) {
+                    $result[] = "  - {$item}: {$firstFile[$item]}";
                 }
-            } elseif (array_key_exists($item, $firstFile)) {
-                return "  - {$item}: {$firstFile[$item]}";
-            } elseif (array_key_exists($item, $secondFile)) {
-                return "  + {$item}: {$secondFile[$item]}";
+                if (array_key_exists($item, $secondFile)) {
+                    $result[] = "  + {$item}: {$secondFile[$item]}";
+                }
             }
+            return $result;
         }, $keys);
 
         $mapped = Collection\flatten($mapped);
