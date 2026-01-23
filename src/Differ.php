@@ -5,6 +5,8 @@ namespace Differ\Differ;
 use Differ\Parsers;
 use Funct\Collection;
 
+const ERROR_MESSAGE = "Please check file URL or format \n";
+
 function process(object $data): string
 {
     $vars = get_object_vars($data);
@@ -77,6 +79,6 @@ function genDiff(string $pathToFile1, string $pathToFile2): string
 
         return "{\n" . implode(" \n", $mapped) . "\n}\n";
     } else {
-        return "Please check file URL or format \n";
+        return ERROR_MESSAGE;
     }
 }
