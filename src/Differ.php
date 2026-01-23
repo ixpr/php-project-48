@@ -2,6 +2,7 @@
 
 namespace Differ\Differ;
 
+use Differ\Parsers;
 use Funct\Collection;
 
 function process(object $data): string
@@ -17,12 +18,39 @@ function process(object $data): string
 
 function genDiff(string $pathToFile1, string $pathToFile2): string
 {
-    $firstFileJson = file_exists($pathToFile1) ? file_get_contents($pathToFile1) : null;
-    $secondFileJson = file_exists($pathToFile2) ? file_get_contents($pathToFile2) : null;
+    $extensions = ['json', 'yml', 'yaml'];
 
-    if ($firstFileJson && $secondFileJson) {
-        $firstFile = parseJson($firstFileJson);
-        $secondFile = parseJson($secondFileJson);
+    $file1Info = pathinfo($pathToFile1);
+    $file2Info = pathinfo($pathToFile2);
+
+    if (
+        file_exists($pathToFile1) &&
+        file_exists($pathToFile2) &&
+        in_array($file1Info['extension'], $extensions) &&
+        in_array($file2Info['extension'], $extensions)
+    ) {
+        $fileArray = function ($pathToFile, $fileInfo) {
+            $contents = file_get_contents($pathToFile);
+            if (in_array($fileInfo['extension'], ['json'])) {
+                $parsedArray = Parsers\parseJson($contents);
+            } elseif (in_array($fileInfo['extension'], ['yml', 'yaml'])) {
+                $parsedArray = Parsers\parseYaml($contents);
+            }
+
+            $booledArray = [];
+            foreach ($parsedArray as $key => $value) {
+                if (is_bool($value)) {
+                    $booledArray[$key] = $value ? 'true' : 'false';
+                } else {
+                    $booledArray[$key] = (string) $value;
+                }
+            }
+
+            return $booledArray;
+        };
+
+        $firstFile = $fileArray($pathToFile1, $file1Info);
+        $secondFile = $fileArray($pathToFile2, $file2Info);
 
         $keys = array_unique(array_merge(array_keys($firstFile), array_keys($secondFile)));
         $keys = Collection\sortBy($keys, fn($num) => $num);
@@ -49,22 +77,6 @@ function genDiff(string $pathToFile1, string $pathToFile2): string
 
         return "{\n" . implode(" \n", $mapped) . "\n}\n";
     } else {
-        return "Please check file URL \n";
+        return "Please check file URL or format \n";
     }
-}
-
-function parseJson(string $json): array
-{
-    $array = json_decode($json, true);
-
-    $stringified = [];
-    foreach ($array as $key => $value) {
-        if (is_bool($value)) {
-            $stringified[$key] = $value ? 'true' : 'false';
-        } else {
-            $stringified[$key] = (string) $value;
-        }
-    }
-
-    return $stringified;
 }

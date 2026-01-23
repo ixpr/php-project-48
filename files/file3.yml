@@ -1,0 +1,3 @@
+host: hexlet.com
+proxy: 132.234.53.22
+follow: true

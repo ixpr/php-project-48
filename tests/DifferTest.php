@@ -10,7 +10,7 @@ use function Differ\Differ\process;
 
 class DifferTest extends TestCase
 {
-    public function testGenDiffer()
+    public function testGenDifferJson()
     {
         $pathToFile1 = $this->getFixtureFullPath('testfile1.json');
         $pathToFile2 = $this->getFixtureFullPath('testfile2.json');
@@ -30,7 +30,30 @@ class DifferTest extends TestCase
         $this->assertStringEqualsFile($pathToExpected3, $actual3);
 
         $actual4 = genDiff($pathToFile1, $pathToNoFile);
-        $this->assertEquals("Please check file URL \n", $actual4);
+        $this->assertEquals("Please check file URL or format \n", $actual4);
+    }
+
+    public function testGenDifferYaml()
+    {
+        $pathToFile1 = $this->getFixtureFullPath('testfile1.yml');
+        $pathToFile2 = $this->getFixtureFullPath('testfile2.yml');
+        $pathToFile3 = $this->getFixtureFullPath('testfile3.yml');
+        $pathToExpected1 = $this->getFixtureFullPath('expected1.txt');
+        $pathToExpected2 = $this->getFixtureFullPath('expected2.txt');
+        $pathToExpected3 = $this->getFixtureFullPath('expected3.txt');
+        $pathToNoFile = $this->getFixtureFullPath('nofile.yml');
+
+        $actual1 = genDiff($pathToFile1, $pathToFile2);
+        $this->assertStringEqualsFile($pathToExpected1, $actual1);
+
+        $actual2 = genDiff($pathToFile1, $pathToFile3);
+        $this->assertStringEqualsFile($pathToExpected2, $actual2);
+
+        $actual3 = genDiff($pathToFile2, $pathToFile3);
+        $this->assertStringEqualsFile($pathToExpected3, $actual3);
+
+        $actual4 = genDiff($pathToFile1, $pathToNoFile);
+        $this->assertEquals("Please check file URL or format \n", $actual4);
     }
 
     public function testProcess()
@@ -43,7 +66,7 @@ class DifferTest extends TestCase
         ];
 
         $actual = process($object);
-        $this->assertEquals("Please check file URL \n", $actual);
+        $this->assertEquals("Please check file URL or format \n", $actual);
     }
 
     public function getFixtureFullPath(string $fixtureName): string

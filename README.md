@@ -13,3 +13,5 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ixpr_php-project-48&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=ixpr_php-project-48)
 ### asciicast: step 4
 [![asciicast](https://asciinema.org/a/770733.svg)](https://asciinema.org/a/770733)
+### asciicast: step 6
+[![asciicast](https://asciinema.org/a/771521.svg)](https://asciinema.org/a/771521)
