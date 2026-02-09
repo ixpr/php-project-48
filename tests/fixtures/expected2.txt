@@ -1,9 +1,9 @@
 {
-  - follow: false 
-  + follow: true 
-  - host: hexlet.io 
-  + host: hexlet.com 
-  - proxy: 123.234.53.22 
-  + proxy: 132.234.53.22 
+  - follow: false
+  + follow: true
+  - host: hexlet.io
+  + host: hexlet.com
+  - proxy: 123.234.53.22
+  + proxy: 132.234.53.22
   - timeout: 50
 }

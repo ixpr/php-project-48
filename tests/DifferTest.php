@@ -14,43 +14,74 @@ class DifferTest extends TestCase
 {
     public function testGenDiffer()
     {
-        $pathToJsonFile1 = $this->getFixtureFullPath('testfile1.json');
-        $pathToJsonFile2 = $this->getFixtureFullPath('testfile2.json');
-        $pathToJsonFile3 = $this->getFixtureFullPath('testfile3.json');
+        $pathToJsonFile1Simple = $this->getFixtureFullPath('testfile1-simple.json');
+        $pathToJsonFile2Simple = $this->getFixtureFullPath('testfile2-simple.json');
+        $pathToJsonFile3Simple = $this->getFixtureFullPath('testfile3-simple.json');
+        $pathToJsonFile1Recursive = $this->getFixtureFullPath('testfile1-recursive.json');
+        $pathToJsonFile2Recursive = $this->getFixtureFullPath('testfile2-recursive.json');
+        $pathToJsonFile3Recursive = $this->getFixtureFullPath('testfile3-recursive.json');
         $pathToJsonNoFile = $this->getFixtureFullPath('nofile.json');
-        $pathToYamlFile1 = $this->getFixtureFullPath('testfile1.yml');
-        $pathToYamlFile2 = $this->getFixtureFullPath('testfile2.yml');
-        $pathToYamlFile3 = $this->getFixtureFullPath('testfile3.yml');
+        $pathToYamlFile1Simple = $this->getFixtureFullPath('testfile1-simple.yml');
+        $pathToYamlFile2Simple = $this->getFixtureFullPath('testfile2-simple.yml');
+        $pathToYamlFile3Simple = $this->getFixtureFullPath('testfile3-simple.yml');
+        $pathToYamlFile1Recursive = $this->getFixtureFullPath('testfile1-recursive.yml');
+        $pathToYamlFile2Recursive = $this->getFixtureFullPath('testfile2-recursive.yml');
+        $pathToYamlFile3Recursive = $this->getFixtureFullPath('testfile3-recursive.yml');
         $pathToYamlNoFile = $this->getFixtureFullPath('nofile.yml');
         $pathToExpected1 = $this->getFixtureFullPath('expected1.txt');
         $pathToExpected2 = $this->getFixtureFullPath('expected2.txt');
         $pathToExpected3 = $this->getFixtureFullPath('expected3.txt');
+        $pathToExpected4 = $this->getFixtureFullPath('expected4.txt');
+        $pathToExpected5 = $this->getFixtureFullPath('expected5.txt');
+        $pathToExpected6 = $this->getFixtureFullPath('expected6.txt');
 
-        // json tests
-        $json1 = genDiff($pathToJsonFile1, $pathToJsonFile2);
+        // json tests simple
+        $json1 = genDiff($pathToJsonFile1Simple, $pathToJsonFile2Simple);
         $this->assertStringEqualsFile($pathToExpected1, $json1);
 
-        $json2 = genDiff($pathToJsonFile1, $pathToJsonFile3);
+        $json2 = genDiff($pathToJsonFile1Simple, $pathToJsonFile3Simple);
         $this->assertStringEqualsFile($pathToExpected2, $json2);
 
-        $json3 = genDiff($pathToJsonFile2, $pathToJsonFile3);
+        $json3 = genDiff($pathToJsonFile2Simple, $pathToJsonFile3Simple);
         $this->assertStringEqualsFile($pathToExpected3, $json3);
 
-        $json4 = genDiff($pathToJsonFile1, $pathToJsonNoFile);
+        // json tests error
+        $json4 = genDiff($pathToJsonFile1Simple, $pathToJsonNoFile);
         $this->assertEquals(ERROR_MESSAGE, $json4);
 
-        // yaml tests
-        $yaml1 = genDiff($pathToYamlFile1, $pathToYamlFile2);
+        // json tests recursive
+        $json5 = genDiff($pathToJsonFile1Recursive, $pathToJsonFile2Recursive);
+        $this->assertStringEqualsFile($pathToExpected4, $json5);
+
+        $json6 = genDiff($pathToJsonFile1Recursive, $pathToJsonFile3Recursive);
+        $this->assertStringEqualsFile($pathToExpected5, $json6);
+
+        $json7 = genDiff($pathToJsonFile2Recursive, $pathToJsonFile3Recursive);
+        $this->assertStringEqualsFile($pathToExpected6, $json7);
+
+        // yaml tests simpe
+        $yaml1 = genDiff($pathToYamlFile1Simple, $pathToYamlFile2Simple);
         $this->assertStringEqualsFile($pathToExpected1, $yaml1);
 
-        $yaml2 = genDiff($pathToYamlFile1, $pathToYamlFile3);
+        $yaml2 = genDiff($pathToYamlFile1Simple, $pathToYamlFile3Simple);
         $this->assertStringEqualsFile($pathToExpected2, $yaml2);
 
-        $yaml3 = genDiff($pathToYamlFile2, $pathToYamlFile3);
+        $yaml3 = genDiff($pathToYamlFile2Simple, $pathToYamlFile3Simple);
         $this->assertStringEqualsFile($pathToExpected3, $yaml3);
 
-        $yaml4 = genDiff($pathToYamlFile2, $pathToYamlNoFile);
+        // json tests error
+        $yaml4 = genDiff($pathToYamlFile2Simple, $pathToYamlNoFile);
         $this->assertEquals(ERROR_MESSAGE, $yaml4);
+
+        // yaml tests recursive
+        $yaml5 = genDiff($pathToYamlFile1Recursive, $pathToYamlFile2Recursive);
+        $this->assertStringEqualsFile($pathToExpected4, $yaml5);
+
+        $yaml6 = genDiff($pathToYamlFile1Recursive, $pathToYamlFile3Recursive);
+        $this->assertStringEqualsFile($pathToExpected5, $yaml6);
+
+        $yaml7 = genDiff($pathToYamlFile2Recursive, $pathToYamlFile3Recursive);
+        $this->assertStringEqualsFile($pathToExpected6, $yaml7);
     }
 
     public function testProcess()
@@ -58,7 +89,7 @@ class DifferTest extends TestCase
         $object = new stdClass();
         $object->args = [
             "--format" => "stylish",
-            "<firstFile>" => $this->getFixtureFullPath('testfile1.json'),
+            "<firstFile>" => $this->getFixtureFullPath('testfile1-simple.json'),
             "<secondFile>" => $this->getFixtureFullPath('nofile.json')
         ];
 

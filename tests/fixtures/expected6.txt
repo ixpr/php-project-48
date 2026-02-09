@@ -1,0 +1,39 @@
+{
+    common: {
+      - follow: false
+      + follow: true
+      - setting1: Value 1
+      - setting3: null
+      - setting4: blah blah
+      - setting5: {
+            key5: value5
+        }
+        setting6: {
+            doge: {
+                wow: so much
+            }
+            key: value
+            ops: vops
+        }
+      + setting7: blah blah
+    }
+    group1: {
+      - baz: bars
+      - foo: bar
+      + foo: {
+            wow: so much
+        }
+      - nest: str
+    }
+  - group3: {
+        deep: {
+            id: {
+                number: 45
+            }
+        }
+        fee: 100500
+    }
+  + group4: {
+        fee: 100500
+    }
+}
