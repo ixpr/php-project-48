@@ -3,6 +3,7 @@
 namespace Differ\Differ;
 
 use Differ\Parsers;
+use Differ\Formatters;
 use Funct\Collection;
 
 const ERROR_MESSAGE = "Please check file URL or format \n";
@@ -54,33 +55,155 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'sty
         $firstFile = $fileArray($pathToFile1, $file1Info);
         $secondFile = $fileArray($pathToFile2, $file2Info);
 
-        $diffArr = processDiff($firstFile, $secondFile);
-        sortArray($diffArr);
+        $diffArr = createDiffArray($firstFile, $secondFile);
 
-        return "{\n" . formatDiff($diffArr, '  ', '', '', $format) . "}\n";
+        editDiffArray($diffArr);
+        sortDiffArray($diffArr);
+        print_r($diffArr);
+
+        return Formatters\format($format, $diffArr);
     } else {
         return ERROR_MESSAGE;
     }
 }
 
-function isAssoc(array $arr): bool
-{
-    return array_keys($arr) !== range(0, count($arr) - 1);
+function createDiffArray(
+    mixed $node,
+    mixed $secondFile,
+    bool $isDiffTopLev = false
+): mixed {
+    if (!is_array($node)) {
+        return $node;
+    }
+
+    return array_reduce(array_keys($node), function ($newAcc, $child) use ($node, $secondFile, $isDiffTopLev) {
+        $inBoth = 'shared';
+        $inFirst = 'deleted';
+        $inSecond = 'inserted';
+
+        if (is_array($secondFile)) {
+            if (array_key_exists($child, $secondFile)) {
+                $diff = $inBoth;
+            } else {
+                if (!$isDiffTopLev) {
+                    $diff = $inFirst;
+                    $isDiffTopLev = true;
+                } else {
+                    $diff = $inBoth;
+                }
+            }
+
+            // adding items present only in second
+            $secondKeys = array_keys($secondFile);
+            $secondUnique = array_diff($secondKeys, array_keys($node));
+            foreach ($secondUnique as $unique) {
+                if (array_search($unique, array_column($newAcc, 'name')) === false) {
+                    $newAcc[] = [
+                        'name' => $unique,
+                        'diff' => $inSecond,
+                        'value' => $secondFile[$unique]
+                    ];
+                }
+            }
+        } else {
+            $diff = $inBoth;
+        }
+
+        $processed = createDiffArray($node[$child], $secondFile[$child] ?? [], $isDiffTopLev);
+
+        // adding updated items
+        if (
+            is_array($node[$child]) && (
+                array_key_exists($child, $secondFile) &&
+                !is_array($secondFile[$child])
+            )
+            ||
+            !is_array($node[$child]) && (
+                is_array($secondFile) &&
+                array_key_exists($child, $secondFile) &&
+                $secondFile[$child] !== $node[$child]
+            )
+        ) {
+            $newAcc[] = [
+                'name' => $child,
+                'diff' => $inFirst,
+                'value' => $node[$child]
+            ];
+            $newAcc[] = [
+                'name' => $child,
+                'diff' => $inSecond,
+                'value' => $secondFile[$child]
+            ];
+            $diff = $inFirst;
+        }
+
+        // adding all other items (shared or present only in first)
+        if (array_search($child, array_column($newAcc, 'name')) === false) {
+            if (
+                is_array($secondFile) &&
+                !array_key_exists($child, $secondFile) &&
+                !in_array($diff, [$inFirst, $inSecond])
+            ) {
+                $newAcc[] = [
+                    'name' => $child,
+                    'value' => $processed
+                ];
+            } else {
+                $newAcc[] = [
+                    'name' => $child,
+                    'diff' => $diff,
+                    'value' => $processed
+                ];
+            }
+        };
+
+        return $newAcc;
+    }, []);
 }
 
-function sortArray(array &$arr): void
+function editDiffArray(array &$diffArray): void
 {
-    if (isAssoc($arr)) {
-        ksort($arr);
-    }
-    foreach ($arr as &$a) {
-        if (is_array($a)) {
-            sortArray($a);
+    foreach ($diffArray as $key => &$subArray) {
+        if (is_array($subArray) && array_key_exists('name', $subArray)) {
+            if (array_key_exists('value', $subArray) && is_array($subArray['value'])) {
+                if (
+                    count($subArray['value']) === 1 &&
+                    !is_array($subArray['value'][array_key_first($subArray['value'])])
+                ) {
+                    $subArray['value'][] = [
+                        'name' => array_key_first($subArray['value']),
+                        'value' => $subArray['value'][array_key_first($subArray['value'])]
+                    ];
+                    unset($subArray['value'][array_key_first($subArray['value'])]);
+                }
+                editDiffArray($subArray['value']);
+            }
+        } else {
+            $diffArray[] = [
+                'name' => $key,
+                'value' => $subArray
+            ];
+            unset($diffArray[$key]);
         }
     }
 }
 
-function processDiff(
+function sortDiffArray(array &$diffArray): void
+{
+    array_multisort(array_column($diffArray, 'name'), SORT_ASC, $diffArray);
+
+    foreach ($diffArray as &$subArray) {
+        if (array_key_exists('value', $subArray) && is_array($subArray['value'])) {
+            sortDiffArray($subArray['value']);
+        }
+    }
+}
+
+
+
+
+/*
+function createDiffArrayOld(
     mixed $node,
     mixed $secondFile,
     bool $isDiffTopLev = false
@@ -115,7 +238,7 @@ function processDiff(
             $prefix = $inBoth;
         }
 
-        $processed = processDiff($node[$child], $secondFile[$child] ?? [], $isDiffTopLev);
+        $processed = createDiffArray($node[$child], $secondFile[$child] ?? [], $isDiffTopLev);
 
         if (is_array($node[$child])) {
             if (
@@ -142,70 +265,42 @@ function processDiff(
     }, []);
 }
 
-function formatDiff(
-    array $node,
-    string $replacer,
-    string $acc,
-    string $subreplacer,
-    string $format,
-    bool $isFirstLvl = true
-): string {
-    return array_reduce(
-        array_keys($node),
-        function ($newAcc, $child) use ($node, $replacer, $subreplacer, $format, $isFirstLvl) {
-            if ($isFirstLvl) {
-                $replacerBlock = "{$replacer}";
-            } else {
-                $replacerBlock = "{$replacer}{$subreplacer}";
-            }
-            if (!is_array($node[$child])) {
-                $formattedKey = formatValue($child, true);
-                $formattedValue = formatValue($node[$child]);
-
-                $newAcc .= "{$replacerBlock}{$subreplacer}{$formattedKey}: {$formattedValue}\n";
-                return $newAcc;
-            } else {
-                $formattedKey = formatValue($child, true);
-                $newAcc .= "{$replacerBlock}{$subreplacer}{$formattedKey}: {\n";
-                return formatDiff($node[$child], $replacer, $newAcc, $subreplacer . $replacer, $format, false) .
-                "{$replacer}{$replacer}{$subreplacer}{$subreplacer}}\n";
-            }
-        },
-        $acc
-    );
-}
-
-function formatValue(mixed $value, bool $isKey = false): string
+function editDiffArrayOld(array &$diffArray): void
 {
-    $type = gettype($value);
-    switch ($type) {
-        case 'boolean':
-            $result = $value === true ? "true" : "false";
-            break;
-
-        case 'NULL':
-            $result = 'null';
-            break;
-
-        case 'string':
-        case 'integer':
-        default:
-            $result = $value;
-            break;
-    }
-
-    if ($isKey) {
-        if (str_contains($result, '|1')) {
-            $result = str_replace('|1', '', $result);
-            $result = '- ' . $result;
-        } elseif (str_contains($result, '|2')) {
-            $result = str_replace('|2', '', $result);
-            $result = '+ ' . $result;
+    foreach ($diffArray as $key => &$subArray) {
+        if (is_array($subArray)) {
+            if (array_key_exists('name', $subArray)) {
+                if (array_key_exists('value', $subArray) && is_array($subArray['value'])) {
+                    if (
+                        count($subArray['value']) === 1 &&
+                        !is_array($subArray['value'][array_key_first($subArray['value'])])
+                    ) {
+                        $subArray['value'][] = [
+                            'name' => array_key_first($subArray['value']),
+                            'value' => $subArray['value'][array_key_first($subArray['value'])]
+                        ];
+                        unset($subArray['value'][array_key_first($subArray['value'])]);
+                    }
+                    editDiffArray($subArray['value']);
+                } elseif (array_key_exists('old-value', $subArray) && is_array($subArray['old-value'])) {
+                    editDiffArray($subArray['old-value']);
+                } elseif (array_key_exists('old-value', $subArray) && is_array($subArray['new-value'])) {
+                    editDiffArray($subArray['new-value']);
+                }
+            } else {
+                $diffArray[] = [
+                    'name' => $key,
+                    'value' => $subArray
+                ];
+                unset($diffArray[$key]);
+            }
         } else {
-            $result = str_replace('|0', '', $result);
-            $result = '  ' . $result;
+            $diffArray[] = [
+                'name' => $key,
+                'value' => $subArray
+            ];
+            unset($diffArray[$key]);
         }
     }
-
-    return $result;
 }
+*/
