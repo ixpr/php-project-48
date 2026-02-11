@@ -17,3 +17,5 @@
 [![asciicast](https://asciinema.org/a/771521.svg)](https://asciinema.org/a/771521)
 ### asciicast: step 7
 [![asciicast](https://asciinema.org/a/783894.svg)](https://asciinema.org/a/783894)
+### asciicast: step 8
+[![asciicast](https://asciinema.org/a/785616.svg)](https://asciinema.org/a/785616)
