@@ -5,11 +5,11 @@ namespace Differ\Formatters;
 function format(string $format, array $diffArray): string
 {
     switch ($format) {
-        /*case 'plain':
+        case 'plain':
             $class = new Plain($diffArray);
             break;
 
-        case 'json':
+        /*case 'json':
             $class = new Json($diffArray);
             break;
         */
@@ -19,5 +19,5 @@ function format(string $format, array $diffArray): string
             break;
     }
 
-    return $class->format() . "\n";
+    return $class->format();
 }

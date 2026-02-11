@@ -1,0 +1,12 @@
+Property 'common.follow' was added with value: true
+Property 'common.setting1' was removed
+Property 'common.setting2' was removed
+Property 'common.setting3' was removed
+Property 'common.setting6.doge.wow' was updated. From '' to 'so much'
+Property 'common.setting6.ops' was added with value: 'vops'
+Property 'common.setting7' was added with value: 205
+Property 'group1.baz' was removed
+Property 'group1.foo' was updated. From 'bar' to [complex value]
+Property 'group1.nest' was removed
+Property 'group2' was removed
+Property 'group4' was added with value: [complex value]

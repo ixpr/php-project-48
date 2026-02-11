@@ -13,8 +13,7 @@ class Stylish
 
     public function format()
     {
-        return "{\n" . $this->formatDiff($this->diffArray, '  ', '', '') . "}";
-        // return '.....';
+        return "{\n" . $this->formatDiff($this->diffArray, '  ', '', '') . "}\n";
     }
 
     private function formatDiff(
@@ -46,35 +45,9 @@ class Stylish
             },
             $acc
         );
-
-        /*
-        return array_reduce(
-            array_keys($node),
-            function ($newAcc, $child) use ($node, $replacer, $subreplacer, $isFirstLvl) {
-                if ($isFirstLvl) {
-                    $replacerBlock = "{$replacer}";
-                } else {
-                    $replacerBlock = "{$replacer}{$subreplacer}";
-                }
-                if (!is_array($node[$child])) {
-                    $formattedKey = $this->formatValue($child, true);
-                    $formattedValue = $this->formatValue($node[$child]);
-
-                    $newAcc .= "{$replacerBlock}{$subreplacer}{$formattedKey}: {$formattedValue}\n";
-                    return $newAcc;
-                } else {
-                    $formattedKey = $this->formatValue($child, true);
-                    $newAcc .= "{$replacerBlock}{$subreplacer}{$formattedKey}: {\n";
-                    return $this->formatDiff($node[$child], $replacer, $newAcc, $subreplacer . $replacer, false) .
-                    "{$replacer}{$replacer}{$subreplacer}{$subreplacer}}\n";
-                }
-            },
-            $acc
-        );
-        */
     }
 
-    public function formatKey(array $child): string
+    private function formatKey(array $child): string
     {
         $name = $child['name'];
 
@@ -100,7 +73,7 @@ class Stylish
         return $result;
     }
 
-    public function formatValue(mixed $value): string
+    private function formatValue(mixed $value): string
     {
         $type = gettype($value);
         switch ($type) {

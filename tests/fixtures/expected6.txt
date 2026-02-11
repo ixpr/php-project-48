@@ -15,7 +15,7 @@
             key: value
             ops: vops
         }
-      + setting7: blah blah
+      + setting7: 205
     }
     group1: {
       - baz: bars
