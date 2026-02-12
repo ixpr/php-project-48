@@ -29,14 +29,15 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $formatName = 
     if (
         file_exists($pathToFile1) &&
         file_exists($pathToFile2) &&
-        in_array($file1Info['extension'], $extensions, false) &&
-        in_array($file2Info['extension'], $extensions, false)
+        in_array($file1Info['extension'] ?? '', $extensions, true) &&
+        in_array($file2Info['extension'] ?? '', $extensions, true)
     ) {
         $fileArray = function ($pathToFile, $fileInfo) {
             $contents = file_get_contents($pathToFile);
-            if (in_array($fileInfo['extension'], ['json'])) {
+            $parsedArray = [];
+            if (in_array($fileInfo['extension'], ['json'], false)) {
                 $parsedArray = Parsers\parseJson($contents);
-            } elseif (in_array($fileInfo['extension'], ['yml', 'yaml'])) {
+            } elseif (in_array($fileInfo['extension'], ['yml', 'yaml'], false)) {
                 $parsedArray = Parsers\parseYaml($contents);
             }
 
@@ -55,7 +56,7 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $formatName = 
         $firstFile = $fileArray($pathToFile1, $file1Info);
         $secondFile = $fileArray($pathToFile2, $file2Info);
 
-        $diffArr = createDiffArray($firstFile, $secondFile, $formatName == 'plain');
+        $diffArr = createDiffArray($firstFile, $secondFile, $formatName === 'plain');
 
         editDiffArray($diffArr);
         sortDiffArray($diffArr);
@@ -101,7 +102,7 @@ function createDiffArray(
                 $secondKeys = array_keys($secondFile);
                 $secondUnique = array_diff($secondKeys, array_keys($node));
                 foreach ($secondUnique as $unique) {
-                    if (array_search($unique, array_column($newAcc, 'name')) === false) {
+                    if (array_search($unique, array_column($newAcc, 'name'), false) === false) {
                         $newAcc[] = [
                             'name' => $unique,
                             'diff' => $inSecond,
@@ -153,11 +154,11 @@ function createDiffArray(
             }
 
             // adding all other items (shared or present only in first)
-            if (array_search($child, array_column($newAcc, 'name')) === false) {
+            if (array_search($child, array_column($newAcc, 'name'), false) === false) {
                 if (
                     is_array($secondFile) &&
                     !array_key_exists($child, $secondFile) &&
-                    !in_array($diff, [$inFirst, $inSecond])
+                    !in_array($diff, [$inFirst, $inSecond], false)
                 ) {
                     $newAcc[] = [
                         'name' => $child,
