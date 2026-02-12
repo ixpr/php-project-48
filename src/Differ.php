@@ -35,10 +35,12 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $formatName = 
         $fileArray = function ($pathToFile, $fileInfo) {
             $contents = file_get_contents($pathToFile);
             $parsedArray = [];
-            if (in_array($fileInfo['extension'], ['json'], false)) {
-                $parsedArray = Parsers\parseJson($contents);
-            } elseif (in_array($fileInfo['extension'], ['yml', 'yaml'], false)) {
-                $parsedArray = Parsers\parseYaml($contents);
+            if ($contents !== false) {
+                if (in_array($fileInfo['extension'], ['json'], true)) {
+                    $parsedArray = Parsers\parseJson($contents);
+                } elseif (in_array($fileInfo['extension'], ['yml', 'yaml'], true)) {
+                    $parsedArray = Parsers\parseYaml($contents);
+                }
             }
 
             $booledArray = [];
@@ -102,7 +104,7 @@ function createDiffArray(
                 $secondKeys = array_keys($secondFile);
                 $secondUnique = array_diff($secondKeys, array_keys($node));
                 foreach ($secondUnique as $unique) {
-                    if (array_search($unique, array_column($newAcc, 'name'), false) === false) {
+                    if (array_search($unique, array_column($newAcc, 'name'), true) === false) {
                         $newAcc[] = [
                             'name' => $unique,
                             'diff' => $inSecond,
@@ -154,11 +156,11 @@ function createDiffArray(
             }
 
             // adding all other items (shared or present only in first)
-            if (array_search($child, array_column($newAcc, 'name'), false) === false) {
+            if (array_search($child, array_column($newAcc, 'name'), true) === false) {
                 if (
                     is_array($secondFile) &&
                     !array_key_exists($child, $secondFile) &&
-                    !in_array($diff, [$inFirst, $inSecond], false)
+                    !in_array($diff, [$inFirst, $inSecond], true)
                 ) {
                     $newAcc[] = [
                         'name' => $child,

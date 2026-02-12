@@ -25,7 +25,7 @@ class Plain
                     $legacy[] = $child['name'];
                     if (
                         array_key_exists('diff', $child) &&
-                        in_array($child['diff'], ['inserted', 'deleted', 'updated'], false)
+                        in_array($child['diff'], ['inserted', 'deleted', 'updated'], true)
                     ) {
                         $newAcc .= $this->formatKey(implode('.', $legacy), $child) . $this->formatValue($child) . "\n";
                         return $newAcc;
@@ -35,7 +35,7 @@ class Plain
                 } else {
                     if (
                         array_key_exists('diff', $child) &&
-                        in_array($child['diff'], ['inserted', 'deleted'], false)
+                        in_array($child['diff'], ['inserted', 'deleted'], true)
                     ) {
                         $legacy[] = $child['name'];
                         $newAcc .= $this->formatKey(implode('.', $legacy), $child) . $this->formatValue($child) . "\n";
@@ -75,7 +75,7 @@ class Plain
         $value = $child['value'];
         $diff = $child['diff'] ?? null;
 
-        if (in_array($diff, ['deleted'], false)) {
+        if (in_array($diff, ['deleted'], true)) {
             return '';
         }
 
