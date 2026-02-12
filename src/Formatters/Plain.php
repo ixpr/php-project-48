@@ -4,14 +4,14 @@ namespace Differ\Formatters;
 
 class Plain
 {
-    public $diffArray;
+    public array $diffArray;
 
     public function __construct(array $diffArray)
     {
         $this->diffArray = $diffArray;
     }
 
-    public function format()
+    public function format(): string
     {
         return $this->formatDiff($this->diffArray, '', []);
     }
@@ -49,6 +49,8 @@ class Plain
 
     private function formatKey(string $name, array $child): string
     {
+        $status = '';
+
         if (array_key_exists('diff', $child)) {
             switch ($child['diff']) {
                 case 'deleted':
@@ -77,7 +79,7 @@ class Plain
             return '';
         }
 
-        if ($diff == 'updated') {
+        if ($diff === 'updated') {
             $old = $this->formatType($child['value'][1]['value']);
             $new = $this->formatType($child['value'][0]['value']);
             return ". From {$old} to {$new}";

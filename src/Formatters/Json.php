@@ -4,14 +4,14 @@ namespace Differ\Formatters;
 
 class Json
 {
-    public $diffArray;
+    public array $diffArray;
 
     public function __construct(array $diffArray)
     {
         $this->diffArray = $diffArray;
     }
 
-    public function format()
+    public function format(): string
     {
         return json_encode($this->diffArray) . "\n";
     }

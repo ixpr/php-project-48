@@ -4,14 +4,14 @@ namespace Differ\Formatters;
 
 class Stylish
 {
-    public $diffArray;
+    public array $diffArray;
 
     public function __construct(array $diffArray)
     {
         $this->diffArray = $diffArray;
     }
 
-    public function format()
+    public function format(): string
     {
         return "{\n" . $this->formatDiff($this->diffArray, '  ', '', '') . "}\n";
     }
@@ -25,7 +25,7 @@ class Stylish
     ): string {
         return array_reduce(
             $node,
-            function ($newAcc, $child) use ($node, $replacer, $subreplacer, $isFirstLvl) {
+            function ($newAcc, $child) use ($replacer, $subreplacer, $isFirstLvl) {
                 if ($isFirstLvl) {
                     $replacerBlock = "{$replacer}";
                 } else {

@@ -29,8 +29,8 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $formatName = 
     if (
         file_exists($pathToFile1) &&
         file_exists($pathToFile2) &&
-        in_array($file1Info['extension'], $extensions) &&
-        in_array($file2Info['extension'], $extensions)
+        in_array($file1Info['extension'], $extensions, false) &&
+        in_array($file2Info['extension'], $extensions, false)
     ) {
         $fileArray = function ($pathToFile, $fileInfo) {
             $contents = file_get_contents($pathToFile);
