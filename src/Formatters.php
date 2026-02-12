@@ -9,10 +9,10 @@ function format(string $format, array $diffArray): string
             $class = new Plain($diffArray);
             break;
 
-        /*case 'json':
+        case 'json':
             $class = new Json($diffArray);
             break;
-        */
+
         case 'stylish':
         default:
             $class = new Stylish($diffArray);

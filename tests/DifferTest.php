@@ -37,6 +37,9 @@ class DifferTest extends TestCase
         $pathToExpected7 = $this->getFixtureFullPath('expected7.txt');
         $pathToExpected8 = $this->getFixtureFullPath('expected8.txt');
         $pathToExpected9 = $this->getFixtureFullPath('expected9.txt');
+        $pathToExpected10 = $this->getFixtureFullPath('expected10.txt');
+        $pathToExpected11 = $this->getFixtureFullPath('expected11.txt');
+        $pathToExpected12 = $this->getFixtureFullPath('expected12.txt');
 
         // STYLISH format
         // json tests simple
@@ -97,6 +100,17 @@ class DifferTest extends TestCase
 
         $json10 = genDiff($pathToJsonFile2Recursive, $pathToJsonFile3Recursive, 'plain');
         $this->assertStringEqualsFile($pathToExpected9, $json10);
+
+        // JSON format
+        // json tests recursive
+        $json11 = genDiff($pathToJsonFile1Recursive, $pathToJsonFile2Recursive, 'json');
+        $this->assertStringEqualsFile($pathToExpected10, $json11);
+
+        $json12 = genDiff($pathToJsonFile1Recursive, $pathToJsonFile3Recursive, 'json');
+        $this->assertStringEqualsFile($pathToExpected11, $json12);
+
+        $json13 = genDiff($pathToJsonFile2Recursive, $pathToJsonFile3Recursive, 'json');
+        $this->assertStringEqualsFile($pathToExpected12, $json13);
     }
 
     public function testProcess()
