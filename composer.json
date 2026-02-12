@@ -8,6 +8,14 @@
         }
     ],
     "license": "MIT",
+    "bin": [
+        "bin/gendiff"
+    ],
+    "scripts": {
+        "gendiff": [
+            "@php ./bin/gendiff"
+        ]
+    },
     "autoload": {
         "psr-4": {
             "Differ\\": "src/"
