@@ -58,7 +58,7 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $formatName = 
         $firstFile = $fileArray($pathToFile1, $file1Info);
         $secondFile = $fileArray($pathToFile2, $file2Info);
 
-        $diffArr = createDiffArray($firstFile, $secondFile, $formatName === 'plain');
+        $diffArr = createDiffArray($firstFile, $secondFile);
 
         editDiffArray($diffArr);
         sortDiffArray($diffArr);
@@ -73,7 +73,6 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $formatName = 
 function createDiffArray(
     mixed $node,
     mixed $secondFile,
-    bool $formatIsPlain = false,
     bool $isDiffTopLev = false
 ): mixed {
     if (!is_array($node)) {
@@ -82,7 +81,7 @@ function createDiffArray(
 
     return array_reduce(
         array_keys($node),
-        function ($newAcc, $child) use ($node, $secondFile, $formatIsPlain, $isDiffTopLev) {
+        function ($newAcc, $child) use ($node, $secondFile, $isDiffTopLev) {
             $inBoth = 'shared';
             $inFirst = 'deleted';
             $inSecond = 'inserted';
@@ -116,7 +115,7 @@ function createDiffArray(
                 $diff = $inBoth;
             }
 
-            $processed = createDiffArray($node[$child], $secondFile[$child] ?? [], $formatIsPlain, $isDiffTopLev);
+            $processed = createDiffArray($node[$child], $secondFile[$child] ?? [], $isDiffTopLev);
 
             // adding updated items
             if (
@@ -131,27 +130,14 @@ function createDiffArray(
                     $secondFile[$child] !== $node[$child]
                 )
             ) {
-                if ($formatIsPlain) {
-                    $newAcc[] = [
-                        'name' => $child,
-                        'diff' => $updated,
-                        'value' => [
-                            'old' => $node[$child],
-                            'new' => $secondFile[$child]
-                        ]
-                    ];
-                } else {
-                    $newAcc[] = [
-                        'name' => $child,
-                        'diff' => $inFirst,
-                        'value' => $node[$child]
-                    ];
-                    $newAcc[] = [
-                        'name' => $child,
-                        'diff' => $inSecond,
-                        'value' => $secondFile[$child]
-                    ];
-                }
+                $newAcc[] = [
+                    'name' => $child,
+                    'diff' => $updated,
+                    'value' => [
+                        'old' => $node[$child],
+                        'new' => $secondFile[$child]
+                    ]
+                ];
                 $diff = $inFirst;
             }
 
@@ -210,7 +196,8 @@ function editDiffArray(array &$diffArray): void
 
 function sortDiffArray(array &$diffArray): void
 {
-    array_multisort(array_column($diffArray, 'name'), SORT_ASC, $diffArray);
+    $diffArrayColumn = array_column($diffArray, 'name');
+    array_multisort($diffArrayColumn, SORT_ASC, $diffArray);
 
     foreach ($diffArray as &$subArray) {
         if (array_key_exists('value', $subArray) && is_array($subArray['value'])) {
